@@ -1,16 +1,8 @@
 let testList: number[][] = [
-  [], // G
-  [6, 5, 2], // 1
-  [4], // 2
-  [], // 3
-  [0, 0, 0], // 4
-  [], // 5
-  [], // 6
-  [3, 6, 4, 5, 6],
-  [],
-  [1, 10, 2],
-  [1, 4, 3, 2]
+  [], [ 2 ], [ 3, 3, 3 ], [ 1 ], [], [], []
 ]
+
+let capacity = 1
 
 const enum Direction {
   UP,
@@ -19,12 +11,14 @@ const enum Direction {
 
 var theLift = function(queues: number[][], capacity: number): any {
   // Your code here!
-  let resultArr: number[] = [0]; // 结果数组
+  let resultArr: number[] = []; // 结果数组
   let liftArr: number[] = []; // 电梯数组
   let direction: Direction = Direction.UP; // 电梯运行方向
   let stopFlag: boolean = false; // 是否停靠标志
-  let index: number = 0; // 当前楼层
+  let index: number = -1; // 当前楼层
   let maxLev: number = 0; // 电梯最高有人的层数
+  let firstTime: boolean = true
+  // queues.unshift([])
 
   // TODO 还需要编写电梯停靠的最高层无需停靠的问题方案
   for (let i = queues.length - 1; i >= 0; i--) {
@@ -49,7 +43,7 @@ var theLift = function(queues: number[][], capacity: number): any {
     if (index === queues.length - 1) { // 到了顶层，改变电梯方向
       stopFlag = true
       direction = Direction.DOWN
-    } else if (index === 0) { // 到了底层，改变电梯方向
+    } else if (index === 0 && !firstTime) { // 到了底层，改变电梯方向
       stopFlag = true
       
       for (let i = queues.length - 1; i >= 0; i--) {
@@ -60,6 +54,7 @@ var theLift = function(queues: number[][], capacity: number): any {
       }
       direction = Direction.UP
     }
+    firstTime = false
 
     if (maxLev < queues.length - 1) {
       if (index === maxLev && liftArr.length === 0) {
@@ -100,6 +95,27 @@ var theLift = function(queues: number[][], capacity: number): any {
       resultArr.push(index)
     }
 
+    // 电梯为空的情况下，判断是否改变电梯的方向
+    if (liftArr.length === 0) {
+      let lowerTrue = !!queues.slice(0, index).join('')
+      let higherTrue = !!queues.slice(index + 1, queues.length)
+      if (!lowerTrue && higherTrue && direction === Direction.DOWN) {
+        direction = Direction.UP
+        liftArr.push(...queues[index])
+        queues[index] = []
+        if (!stopFlag) {
+          resultArr.push(index)
+        }
+      } else if (lowerTrue && !higherTrue && direction === Direction.UP) {
+        direction = Direction.DOWN
+        liftArr.push(...queues[index])
+        queues[index] = []
+        if (!stopFlag) {
+          resultArr.push(index)
+        }
+      }
+    }
+
     if (queues.join('') === '' && liftArr.length === 0) {
       break;
     }
@@ -108,7 +124,10 @@ var theLift = function(queues: number[][], capacity: number): any {
   if (resultArr[resultArr.length - 1] !== 0) {
     resultArr.push(0)
   }
+  if (resultArr[0] !== 0) {
+      resultArr.unshift(0)
+  }
   return resultArr
 }
 
-console.log(theLift(testList, 5))
+console.log(theLift(testList, capacity))
