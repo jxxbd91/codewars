@@ -1,15 +1,15 @@
 let testList: number[][] = [
-  [], // 0 ----
-  [6, 5, 2], // 1 ----
-  [4], // 2 ---- 2
-  [], // 3 ----
-  [0, 0, 0], // 4 ---- 4
-  [], // 5 ---- 5
-  [], // 6 ---- 6
-  [3, 6, 4, 5, 6], // 7 ----
-  [], // 8 ----
-  [1, 10, 2], // 9 ----
-  [1, 4, 3, 2] // 10 ---- 10
+  [], // G
+  [6, 5, 2], // 1
+  [4], // 2
+  [], // 3
+  [0, 0, 0], // 4
+  [], // 5
+  [], // 6
+  [3, 6, 4, 5, 6],
+  [],
+  [1, 10, 2],
+  [1, 4, 3, 2]
 ]
 
 const enum Direction {
@@ -19,7 +19,7 @@ const enum Direction {
 
 var theLift = function(queues: number[][], capacity: number): any {
   // Your code here!
-  let resultArr: number[] = []; // 结果数组
+  let resultArr: number[] = [0]; // 结果数组
   let liftArr: number[] = []; // 电梯数组
   let direction: Direction = Direction.UP; // 电梯运行方向
   let stopFlag: boolean = false; // 是否停靠标志
@@ -35,54 +35,80 @@ var theLift = function(queues: number[][], capacity: number): any {
   }
 
   while (true) {
-    if (direction === Direction.UP) {
-      index++
-    } else {
-      index--
-    }
+    // 通过电梯方向决定楼层是上升还是下降
+    direction === Direction.UP ? index++ : index--
     stopFlag = false
+    
+    // 是否有人要下电梯
     if (liftArr.indexOf(index) > -1) {
-      // console.log(index)
-      // 电梯中有人要下
       stopFlag = true
       // 电梯中人下去
       liftArr = liftArr.filter(liftItem => liftItem !== index)
     }
 
-    if (index === queues.length - 1) {
+    if (index === queues.length - 1) { // 到了顶层，改变电梯方向
       stopFlag = true
       direction = Direction.DOWN
-    } else if (index === 0) {
+    } else if (index === 0) { // 到了底层，改变电梯方向
       stopFlag = true
+      
+      for (let i = queues.length - 1; i >= 0; i--) {
+        if (queues[i].length > 0) {
+          maxLev = i;
+          break;
+        }
+      }
       direction = Direction.UP
     }
+
+    if (maxLev < queues.length - 1) {
+      if (index === maxLev && liftArr.length === 0) {
+        // 此处需要停下电梯，首先看是否有人是向上的
+        stopFlag = true
+        queues[index] = queues[index].filter(que => {
+          if (que > index) {
+            if (liftArr.length < capacity) {
+              liftArr.push(que)
+              return false
+            }
+          }
+          return true
+        })
+        // 如果电梯内有人要继续向上继续保持向上
+        direction = liftArr.length > 0 ? Direction.UP : Direction.DOWN
+      }
+    }
+
     queues[index] = queues[index].filter(que => {
-      // console.log(direction)
       if (que > index && direction === Direction.UP) { // 当前楼层有人要向上
-        liftArr.push(que)
         stopFlag = true
-        return false
+        if (liftArr.length < capacity) {
+          liftArr.push(que)
+          return false
+        }
       } else if (que < index && direction === Direction.DOWN) { // 当前楼层有人要向下
-        // console.log(index)
         stopFlag = true
-        liftArr.push(que)
-        return false
+        if (liftArr.length < capacity) {
+          liftArr.push(que)
+          return false
+        }
       }
       return true
     })
+
     if (stopFlag) {
       resultArr.push(index)
     }
 
-    if (queues.join('') === '') {
+    if (queues.join('') === '' && liftArr.length === 0) {
       break;
     }
   }
 
-  return {
-    resultArr,
-    liftArr
-  };
+  if (resultArr[resultArr.length - 1] !== 0) {
+    resultArr.push(0)
+  }
+  return resultArr
 }
 
-console.log(theLift(testList, 10))
+console.log(theLift(testList, 5))
