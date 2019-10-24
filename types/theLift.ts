@@ -1,8 +1,15 @@
 let testList: number[][] = [
-  [], [ 2 ], [ 3, 3, 3 ], [ 1 ], [], [], []
+  [ 7, 3 ],
+  [],
+  [ 5, 3 ],
+  [ 0, 1, 6, 6 ],
+  [ 0, 3, 2, 7 ],
+  [],
+  [ 1 ],
+  [ 5 ]
 ]
 
-let capacity = 1
+let capacity = 2
 
 const enum Direction {
   UP,
@@ -57,7 +64,7 @@ var theLift = function(queues: number[][], capacity: number): any {
     firstTime = false
 
     if (maxLev < queues.length - 1) {
-      if (index === maxLev && liftArr.length === 0) {
+      if (index === maxLev && liftArr.length === 0 && direction === Direction.UP) {
         // 此处需要停下电梯，首先看是否有人是向上的
         stopFlag = true
         queues[index] = queues[index].filter(que => {
@@ -98,7 +105,7 @@ var theLift = function(queues: number[][], capacity: number): any {
     // 电梯为空的情况下，判断是否改变电梯的方向
     if (liftArr.length === 0) {
       let lowerTrue = !!queues.slice(0, index).join('')
-      let higherTrue = !!queues.slice(index + 1, queues.length)
+      let higherTrue = !!queues.slice(index + 1).join('')
       if (!lowerTrue && higherTrue && direction === Direction.DOWN) {
         direction = Direction.UP
         liftArr.push(...queues[index])
@@ -112,6 +119,26 @@ var theLift = function(queues: number[][], capacity: number): any {
         queues[index] = []
         if (!stopFlag) {
           resultArr.push(index)
+        }
+      } else if (!lowerTrue && !higherTrue && queues[index]) { // 上下都没有人,并且当前层有人
+        // 电梯中是否有跟此时电梯方向保持一致的
+        queues[index].filter(q => {
+          let isUp = q - index > 0 // 此人方向跟电梯保持同步
+          if ((isUp && direction === Direction.UP) || (!isUp && direction === Direction.DOWN)) {
+            liftArr.push(q)
+            return false
+          }
+          return true
+        })
+
+        // 没有同方向的人
+        if (liftArr.length === 0) {
+          direction = direction === Direction.DOWN ? Direction.UP : Direction.DOWN
+          liftArr.push(...queues[index].splice(0, queues.length))
+
+          if (!stopFlag) {
+            resultArr.push(index);
+          }
         }
       }
     }
