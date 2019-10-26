@@ -1,13 +1,26 @@
 "use strict";
 let testList = [
-    [ 1 ],
-  [ 6 ],
-  [ 1, 4, 5 ],
-  [ 5, 1, 2 ],
-  [],
-  [ 6, 1, 2, 1 ],
-  [ 4, 0, 5 ],
-  [ 2, 0, 4, 6 ]
+    [15],
+    [3, 11],
+    [6, 1, 10],
+    [4, 13, 4, 16],
+    [3],
+    [19, 9, 17, 7],
+    [14, 2, 0],
+    [15, 2, 11, 6],
+    [14, 17, 18],
+    [17, 7, 8],
+    [14, 6, 4, 1],
+    [],
+    [8, 16, 1],
+    [2, 20, 1],
+    [15, 10, 11],
+    [5, 7, 1],
+    [15, 5],
+    [4],
+    [10, 8, 4],
+    [],
+    [19, 18]
 ];
 let capacity = 1;
 var theLift = function (queues, capacity) {
@@ -95,16 +108,26 @@ var theLift = function (queues, capacity) {
             let higherTrue = !!queues.slice(index + 1).join('');
             if (!lowerTrue && higherTrue && direction === 1 /* DOWN */) {
                 direction = 0 /* UP */;
-                liftArr.push(...queues[index]);
-                queues[index] = [];
+                if (capacity < queues[index].length) {
+                    liftArr.push(...(queues[index].splice(0, capacity)));
+                }
+                else {
+                    liftArr.push(...queues[index]);
+                    queues[index] = [];
+                }
                 if (!stopFlag) {
                     resultArr.push(index);
                 }
             }
             else if (lowerTrue && !higherTrue && direction === 0 /* UP */) {
                 direction = 1 /* DOWN */;
-                liftArr.push(...queues[index]);
-                queues[index] = [];
+                if (capacity < queues[index].length) {
+                    liftArr.push(...(queues[index].splice(0, capacity)));
+                }
+                else {
+                    liftArr.push(...queues[index]);
+                    queues[index] = [];
+                }
                 if (!stopFlag) {
                     resultArr.push(index);
                 }
@@ -114,6 +137,8 @@ var theLift = function (queues, capacity) {
                 queues[index].filter(q => {
                     let isUp = q - index > 0; // 此人方向跟电梯保持同步
                     if ((isUp && direction === 0 /* UP */) || (!isUp && direction === 1 /* DOWN */)) {
+                        if (liftArr.length === capacity)
+                            return true;
                         liftArr.push(q);
                         return false;
                     }
@@ -122,7 +147,7 @@ var theLift = function (queues, capacity) {
                 // 没有同方向的人
                 if (liftArr.length === 0) {
                     direction = direction === 1 /* DOWN */ ? 0 /* UP */ : 1 /* DOWN */;
-                    liftArr.push(...queues[index].splice(0, queues.length));
+                    liftArr.push(...queues[index].splice(0, Math.min(queues.length, capacity)));
                     if (!stopFlag) {
                         resultArr.push(index);
                     }
@@ -141,4 +166,4 @@ var theLift = function (queues, capacity) {
     }
     return resultArr;
 };
-console.log(theLift(testList, capacity));
+console.log(theLift(testList, capacity).join());

@@ -1,15 +1,28 @@
 let testList: number[][] = [
-  [ 7, 3 ],
+  [ 15 ],
+  [ 3, 11 ],
+  [ 6, 1, 10 ],
+  [ 4, 13, 4, 16 ],
+  [ 3 ],
+  [ 19, 9, 17, 7 ],
+  [ 14, 2, 0 ],
+  [ 15, 2, 11, 6 ],
+  [ 14, 17, 18 ],
+  [ 17, 7, 8 ],
+  [ 14, 6, 4, 1 ],
   [],
-  [ 5, 3 ],
-  [ 0, 1, 6, 6 ],
-  [ 0, 3, 2, 7 ],
+  [ 8, 16, 1 ],
+  [ 2, 20, 1 ],
+  [ 15, 10, 11 ],
+  [ 5, 7, 1 ],
+  [ 15, 5 ],
+  [ 4 ],
+  [ 10, 8, 4 ],
   [],
-  [ 1 ],
-  [ 5 ]
+  [ 19, 18 ]
 ]
 
-let capacity = 2
+let capacity = 1
 
 const enum Direction {
   UP,
@@ -108,15 +121,23 @@ var theLift = function(queues: number[][], capacity: number): any {
       let higherTrue = !!queues.slice(index + 1).join('')
       if (!lowerTrue && higherTrue && direction === Direction.DOWN) {
         direction = Direction.UP
-        liftArr.push(...queues[index])
-        queues[index] = []
+        if (capacity < queues[index].length) {
+          liftArr.push(...(queues[index].splice(0, capacity)))
+        } else {
+          liftArr.push(...queues[index])
+          queues[index] = []
+        }
         if (!stopFlag) {
           resultArr.push(index)
         }
       } else if (lowerTrue && !higherTrue && direction === Direction.UP) {
         direction = Direction.DOWN
-        liftArr.push(...queues[index])
-        queues[index] = []
+        if (capacity < queues[index].length) {
+          liftArr.push(...(queues[index].splice(0, capacity)))
+        } else {
+          liftArr.push(...queues[index])
+          queues[index] = []
+        }
         if (!stopFlag) {
           resultArr.push(index)
         }
@@ -125,6 +146,7 @@ var theLift = function(queues: number[][], capacity: number): any {
         queues[index].filter(q => {
           let isUp = q - index > 0 // 此人方向跟电梯保持同步
           if ((isUp && direction === Direction.UP) || (!isUp && direction === Direction.DOWN)) {
+            if (liftArr.length === capacity) return true
             liftArr.push(q)
             return false
           }
@@ -134,7 +156,7 @@ var theLift = function(queues: number[][], capacity: number): any {
         // 没有同方向的人
         if (liftArr.length === 0) {
           direction = direction === Direction.DOWN ? Direction.UP : Direction.DOWN
-          liftArr.push(...queues[index].splice(0, queues.length))
+          liftArr.push(...queues[index].splice(0, Math.min(queues.length, capacity)))
 
           if (!stopFlag) {
             resultArr.push(index);
@@ -157,4 +179,4 @@ var theLift = function(queues: number[][], capacity: number): any {
   return resultArr
 }
 
-console.log(theLift(testList, capacity))
+console.log(theLift(testList, capacity).join())
