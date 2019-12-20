@@ -43,6 +43,17 @@ function getIRes(xlen, ylen) {
     return res;
 }
 function getFIRes(s) {
+    /**
+     * 是不是颠倒数
+     * |—— 是：公式求解
+     * |—— 否：
+     *    |—— 奇数：
+     *       |—— 中间数拿掉是不是颠倒数
+     *          |—— 是：公式 * mid
+     *          |—— 否：公式求解
+     *    |—— 偶数：
+     *        |—— 公式求解
+     */
     const list = ['0', '1', '6', '8', '9'];
     const midList = ['0', '1', '8'];
     let r = 1;
@@ -54,10 +65,14 @@ function getFIRes(s) {
                     // ji shu
                     if (midList.includes(s[i])) { // 中间数是颠倒数
                         if (isUpsideDownNum(s[i].substring(0, i) + s[i].substring(i + 1, s.length))) { // 本身是
+                            r *= midList[s[i]];
                         }
                         else { // 本身不是
-                            r *=
-                            ;
+                            if (s[i] === '0') { // 中间为0
+                            }
+                            else {
+                                r *= midList[s[i] - 1];
+                            }
                         }
                     }
                     else {
@@ -89,6 +104,14 @@ function getFIRes(s) {
     return r;
 }
 function isUpsideDownNum(s) {
+    let flag = true;
+    for (let i = 0, j = s.length - 1; i < j; i++, j--) {
+        if (s[i] !== s[j] && '69' !== `${s[i]}${s[j]}` && '96' !== `${s[i]}${s[j]}`) {
+            flag = false;
+            break;
+        }
+    }
+    return flag;
 }
 // getFIRes('12307500')
 console.log(getFIRes('123'));
