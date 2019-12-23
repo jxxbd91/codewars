@@ -1,6 +1,9 @@
 "use strict";
-const normalList = [1, 2, 2, 2, 2, 2, 3, 3, 4, 5];
-const midList = [1, 2, 2, 2, 2, 2, 2, 2, 3, 3];
+const normalNumbersList = [1, 2, 2, 2, 2, 2, 3, 3, 4, 5];
+const midNumbersList = [1, 2, 2, 2, 2, 2, 2, 2, 3, 3];
+const firstIndexList = [1, 6, 8, 9];
+const midIndexList = [0, 1, 8];
+const normalIndexList = [0, 1, 6, 8, 9];
 function upsideDown(x, y) {
     //your code goes here. you can do it!
     let xM = 0, yM = 0;
@@ -29,8 +32,8 @@ function upsideDown(x, y) {
         return getIRes(tx.length, ylen) - getFIRes(x) + yM + xM;
     }
     else {
-        let tx = x[0] + ''.padStart(x.length - 1, '0');
-        let ty = y[0] + ''.padStart(y.length - 1, '0');
+        let tx = '1' + ''.padStart(x.length - 1, '0');
+        let ty = '1' + ''.padStart(y.length - 1, '0');
         return getIRes(tx.length, ty.length) + getFIRes(y) - getFIRes(x) + yM + xM;
     }
 }
@@ -42,77 +45,68 @@ function getIRes(xlen, ylen) {
     }
     return res;
 }
-function getFIRes(s) {
-    /**
-     * 是不是颠倒数
-     * |—— 是：公式求解
-     * |—— 否：
-     *    |—— 奇数：
-     *       |—— 中间数拿掉是不是颠倒数
-     *          |—— 是：公式 * mid
-     *          |—— 否：公式求解
-     *    |—— 偶数：
-     *        |—— 公式求解
-     */
-    const list = ['0', '1', '6', '8', '9'];
-    const midList = ['0', '1', '8'];
-    let r = 1;
-    for (let i = 0; i < s.length; i++) {
-        if (list.includes(s[i])) {
-            if (i === Math.ceil(s.length / 2) - 1) {
-                // zhong jian
-                if (s.length % 2 === 1) {
-                    // ji shu
-                    if (midList.includes(s[i])) { // 中间数是颠倒数
-                        if (isUpsideDownNum(s[i].substring(0, i) + s[i].substring(i + 1, s.length))) { // 本身是
-                            r *= midList[s[i]];
-                        }
-                        else { // 本身不是
-                            if (s[i] === '0') { // 中间为0
-                            }
-                            else {
-                                r *= midList[s[i] - 1];
-                            }
-                        }
-                    }
-                    else {
-                        r *= midList[s[i]];
-                        break;
-                    }
-                }
-                else {
-                    // ou shu
-                }
+function getFIRes(sn) {
+    let len = sn.length;
+    let midIndex = Math.ceil(len / 2) - 1; // 中间位置
+    let midSnNum = -1; // 中间数，如果是偶数就是 0 ，奇数则取 sn[midIndex] 的值
+    let res = 0;
+    if (len % 2 === 1) {
+        midSnNum = Number(sn[midIndex]);
+        sn = sn.substring(0, midIndex) + sn.substring(midIndex + 1);
+    }
+    for (let s = 0, e = sn.length - 1; s < e; s++, e--) {
+        let sNum = Number(sn[s]), snHalfLen = sn.length / 2, eNum = Number(sn[e]);
+        if (s === 0 && firstIndexList.indexOf(sNum) > -1 && s !== e - 1) {
+            // 第一位是颠倒数
+            res += sNum === 1 ? 0 : (normalNumbersList[sNum - 1] - 1) * Math.pow(5, (snHalfLen - 1)) * (midSnNum > -1 ? midNumbersList[midSnNum] : 1);
+        }
+        else if (s === 0 && firstIndexList.indexOf(sNum) === -1) {
+            // 第一位不是颠倒数
+            return (normalNumbersList[sNum - 1] - 1) * Math.pow(5, (snHalfLen - 1)) * (midSnNum > -1 ? midNumbersList[midSnNum] : 1);
+        }
+        else if (s !== e - 1 && normalIndexList.indexOf(sNum) > -1) {
+            // 其他位是颠倒数
+            res += sNum === 0 ? 0 : normalNumbersList[sNum - 1] * Math.pow(5, (snHalfLen - s - 1)) * (midSnNum > -1 ? midNumbersList[midSnNum] : 1);
+        }
+        else if (s !== e - 1) {
+            // 其他位不是颠倒数
+            return res + normalNumbersList[sNum - 1] * Math.pow(5, (snHalfLen - s - 1)) * (midSnNum > -1 ? midNumbersList[midSnNum] : 1);
+        }
+        if (s === e - 1 && normalIndexList.indexOf(sNum) > -1) {
+            if (midSnNum === 0 && sNum === 0)
+                continue;
+            // 最后一位是颠倒数
+            if (sNum <= eNum) {
+                res += (s === 0 ? (normalNumbersList[sNum - 1] - 1) : normalNumbersList[sNum - 1]) * (midSnNum > -1 ? 3 : 1) + (midSnNum > -1 ? midNumbersList[midSnNum] : 0);
             }
-            r *= i === 0 ? (normalList[s[i]] - 1) : normalList[s[i]];
+            else {
+                res += (s === 0 ? (normalNumbersList[sNum - 1] - 1) : normalNumbersList[sNum - 1]) * (midSnNum > -1 ? 3 : 1) + (midSnNum > 0 ? midNumbersList[midSnNum - 1] : 0);
+            }
         }
-        else {
-            r *= i === 0
-                ? (normalList[s[i]] - 1)
-                : i === Math.floor(s.length / 2)
-                    ? midList[s[i]]
-                    : normalList[s[i]];
-            if (i === Math.floor(s.length / 2))
-                return r;
-            r *=
-                s.length % 2 === 1
-                    ? Math.pow(5, ((s.length - 1) / 2 - i - 1)) * 3
-                    : Math.pow(5, (s.length / 2 - i - 1));
-            break;
+        else if (s === e - 1) {
+            // 最后一位不是颠倒数
+            res += normalNumbersList[sNum - 1];
         }
     }
-    return r;
-}
-function isUpsideDownNum(s) {
-    let flag = true;
-    for (let i = 0, j = s.length - 1; i < j; i++, j--) {
-        if (s[i] !== s[j] && '69' !== `${s[i]}${s[j]}` && '96' !== `${s[i]}${s[j]}`) {
-            flag = false;
-            break;
-        }
-    }
-    return flag;
+    return res;
 }
 // getFIRes('12307500')
 console.log(getFIRes('123'));
 // console.log(upsideDown('123', '1234'))
+// 12345678 9 00000000
+// 10000000 0 00000000
+// 12000000 0 00000000
+// 2 * 5 ** 6 * 3
+// 12000000 0 00000000
+// 12300000 0 00000000
+// 688968 000000
+// 
+// 680000 000000
+// 600000 000000
+// 
+/**
+ * 是否是奇数
+ *  是：
+ *
+ *  否：
+ */
