@@ -1,4 +1,4 @@
-"use strict";
+
 const normalNumbersList = [1, 2, 2, 2, 2, 2, 3, 3, 4, 5];
 const midNumbersList = [1, 2, 2, 2, 2, 2, 2, 2, 3, 3];
 const firstIndexList = [1, 6, 8, 9];
@@ -58,25 +58,29 @@ function getFIRes(sn) {
         let sNum = Number(sn[s]), snHalfLen = sn.length / 2, eNum = Number(sn[e]);
         if (s === 0 && firstIndexList.indexOf(sNum) > -1 && s !== e - 1) {
             // 第一位是颠倒数
-            res += sNum === 1 ? 0 : (normalNumbersList[sNum - 1] - 1) * Math.pow(5, (snHalfLen - 1)) * (midSnNum > -1 ? midNumbersList[midSnNum] : 1);
+            res += sNum === 1 ? 0 : (normalNumbersList[sNum - 1] - 1) * Math.pow(5, (snHalfLen - 1)) * (midSnNum > -1 ? 3 : 1);
         }
         else if (s === 0 && firstIndexList.indexOf(sNum) === -1) {
             // 第一位不是颠倒数
-            return (normalNumbersList[sNum - 1] - 1) * Math.pow(5, (snHalfLen - 1)) * (midSnNum > -1 ? midNumbersList[midSnNum] : 1);
+            return (normalNumbersList[sNum - 1] - 1) * Math.pow(5, (snHalfLen - 1)) * (midSnNum > -1 ? 3 : 1);
         }
         else if (s !== e - 1 && normalIndexList.indexOf(sNum) > -1) {
             // 其他位是颠倒数
-            res += sNum === 0 ? 0 : normalNumbersList[sNum - 1] * Math.pow(5, (snHalfLen - s - 1)) * (midSnNum > -1 ? midNumbersList[midSnNum] : 1);
+            res += sNum === 0 ? 0 : normalNumbersList[sNum - 1] * Math.pow(5, (snHalfLen - s - 1)) * (midSnNum > -1 ? 3 : 1);
         }
         else if (s !== e - 1) {
             // 其他位不是颠倒数
-            return res + normalNumbersList[sNum - 1] * Math.pow(5, (snHalfLen - s - 1)) * (midSnNum > -1 ? midNumbersList[midSnNum] : 1);
+            return res + normalNumbersList[sNum - 1] * Math.pow(5, (snHalfLen - s - 1)) * (midSnNum > -1 ? 3 : 1);
         }
         if (s === e - 1 && normalIndexList.indexOf(sNum) > -1) {
             if (midSnNum === 0 && sNum === 0)
-                continue;
+                break;
             // 最后一位是颠倒数
             if (sNum <= eNum) {
+                if (sNum === 0) {
+                    res += midSnNum > -1 ? midNumbersList[midSnNum] : 0;
+                    break;
+                }
                 res += (s === 0 ? (normalNumbersList[sNum - 1] - 1) : normalNumbersList[sNum - 1]) * (midSnNum > -1 ? 3 : 1) + (midSnNum > -1 ? midNumbersList[midSnNum] : 0);
             }
             else {
@@ -90,23 +94,3 @@ function getFIRes(sn) {
     }
     return res;
 }
-// getFIRes('12307500')
-console.log(getFIRes('123'));
-// console.log(upsideDown('123', '1234'))
-// 12345678 9 00000000
-// 10000000 0 00000000
-// 12000000 0 00000000
-// 2 * 5 ** 6 * 3
-// 12000000 0 00000000
-// 12300000 0 00000000
-// 688968 000000
-// 
-// 680000 000000
-// 600000 000000
-// 
-/**
- * 是否是奇数
- *  是：
- *
- *  否：
- */

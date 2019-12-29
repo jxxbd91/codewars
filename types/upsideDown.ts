@@ -63,20 +63,24 @@ function getFIRes(sn: string): number {
       res += sNum === 1 ? 0 : (normalNumbersList[sNum - 1] - 1) * 5 ** (snHalfLen - 1) * (midSnNum > -1 ? midNumbersList[midSnNum] : 1)
     } else if (s === 0 && firstIndexList.indexOf(sNum) === -1) {
       // 第一位不是颠倒数
-      return (normalNumbersList[sNum - 1] - 1) * 5 ** (snHalfLen - 1) * (midSnNum > -1 ? midNumbersList[midSnNum] : 1)
+      return (normalNumbersList[sNum - 1] - 1) * 5 ** (snHalfLen - 1) * (midSnNum > -1 ? 3 : 1)
     } else if (s !== e -1 && normalIndexList.indexOf(sNum) > -1) {
       // 其他位是颠倒数
-      res += sNum === 0 ? 0 : normalNumbersList[sNum - 1] * 5 ** (snHalfLen - s - 1) * (midSnNum > -1 ? midNumbersList[midSnNum] : 1)
+      res += sNum === 0 ? 0 : normalNumbersList[sNum - 1] * 5 ** (snHalfLen - s - 1) * (midSnNum > -1 ? 3 : 1)
     } else if (s !== e -1) {
       // 其他位不是颠倒数
-      return res + normalNumbersList[sNum - 1] * 5 ** (snHalfLen - s - 1) * (midSnNum > -1 ? midNumbersList[midSnNum] : 1)
+      return res + normalNumbersList[sNum - 1] * 5 ** (snHalfLen - s - 1) * (midSnNum > -1 ? 3 : 1)
     }
 
     if (s === e - 1 && normalIndexList.indexOf(sNum) > -1) {
-      if (midSnNum === 0 && sNum === 0) continue
+      if (midSnNum === 0 && sNum === 0) break
       // 最后一位是颠倒数
       if (sNum <= eNum) {
-        res += (s === 0 ? (normalNumbersList[sNum - 1] - 1)  : normalNumbersList[sNum - 1]) * (midSnNum > -1 ? 3 : 1) + (midSnNum > -1 ? midNumbersList[midSnNum] : 0)
+        if (sNum === 0) {
+          res += midSnNum > -1 ? midNumbersList[midSnNum] : 0;
+          break
+        }
+        res += (s === 0 ? (normalNumbersList[sNum] - 1)  : normalNumbersList[sNum - 1]) * (midSnNum > -1 ? 3 : 1) + (midSnNum > -1 ? midNumbersList[midSnNum] : 0)
       } else {
         res += (s === 0 ? (normalNumbersList[sNum - 1] - 1)  : normalNumbersList[sNum - 1]) * (midSnNum > -1 ? 3 : 1) + (midSnNum > 0 ? midNumbersList[midSnNum - 1] : 0)
       }
@@ -91,7 +95,7 @@ function getFIRes(sn: string): number {
 
 // getFIRes('12307500')
 
-console.log(getFIRes('123'))
+console.log(getFIRes('9090908074312'))
 // console.log(upsideDown('123', '1234'))
 
 
